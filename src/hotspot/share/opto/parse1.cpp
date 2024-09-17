@@ -2394,8 +2394,7 @@ void Parse::rtm_deopt() {
 //------------------------------return_current---------------------------------
 // Append current _map to _exit_return
 void Parse::return_current(Node* value) {
-  if (RegisterFinalizersAtInit &&
-      method()->intrinsic_id() == vmIntrinsics::_Object_init) {
+  if (method()->intrinsic_id() == vmIntrinsics::_Object_init) {
     call_register_finalizer();
   }
 

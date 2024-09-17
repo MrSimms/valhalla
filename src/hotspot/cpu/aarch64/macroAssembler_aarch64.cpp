@@ -5412,7 +5412,7 @@ void MacroAssembler::allocate_instance(Register klass, Register new_obj,
 
   // get instance_size in InstanceKlass (scaled to a count of bytes)
   ldrw(layout_size, Address(klass, Klass::layout_helper_offset()));
-  // test to see if it has a finalizer or is malformed in some way
+  // test to see if it is malformed in some way
   tst(layout_size, Klass::_lh_instance_slow_path_bit);
   br(Assembler::NE, slow_case_no_pop);
 
