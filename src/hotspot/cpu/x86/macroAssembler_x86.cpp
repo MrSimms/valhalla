@@ -7060,7 +7060,7 @@ void MacroAssembler::generate_fill(BasicType t, bool aligned,
     orl(value, rtmp);
   }
 
-  cmpl(count, 2<<shift); // Short arrays (< 8 bytes) fill by element
+  cmpptr(count, 2<<shift); // Short arrays (< 8 bytes) fill by element
   jcc(Assembler::below, L_fill_4_bytes); // use unsigned cmp
   if (!UseUnalignedLoadStores && !aligned && (t == T_BYTE || t == T_SHORT)) {
     Label L_skip_align2;
@@ -7080,13 +7080,13 @@ void MacroAssembler::generate_fill(BasicType t, bool aligned,
     jccb(Assembler::zero, L_skip_align2);
     movw(Address(to, 0), value);
     addptr(to, 2);
-    subl(count, 1<<(shift-1));
+    subptr(count, 1<<(shift-1));
     BIND(L_skip_align2);
   }
   if (UseSSE < 2) {
     Label L_fill_32_bytes_loop, L_check_fill_8_bytes, L_fill_8_bytes_loop, L_fill_8_bytes;
     // Fill 32-byte chunks
-    subl(count, 8 << shift);
+    subptr(count, 8 << shift);
     jcc(Assembler::less, L_check_fill_8_bytes);
     align(16);
 
@@ -7097,10 +7097,10 @@ void MacroAssembler::generate_fill(BasicType t, bool aligned,
     }
 
     addptr(to, 32);
-    subl(count, 8 << shift);
+    subptr(count, 8 << shift);
     jcc(Assembler::greaterEqual, L_fill_32_bytes_loop);
     BIND(L_check_fill_8_bytes);
-    addl(count, 8 << shift);
+    addptr(count, 8 << shift);
     jccb(Assembler::zero, L_exit);
     jmpb(L_fill_8_bytes);
 
@@ -7112,7 +7112,7 @@ void MacroAssembler::generate_fill(BasicType t, bool aligned,
     movl(Address(to, 4), value);
     addptr(to, 8);
     BIND(L_fill_8_bytes);
-    subl(count, 1 << (shift + 1));
+    subptr(count, 1 << (shift + 1));
     jcc(Assembler::greaterEqual, L_fill_8_bytes_loop);
     // fall through to fill 4 bytes
   } else {
@@ -7123,7 +7123,7 @@ void MacroAssembler::generate_fill(BasicType t, bool aligned,
       jccb(Assembler::zero, L_fill_32_bytes);
       movl(Address(to, 0), value);
       addptr(to, 4);
-      subl(count, 1<<shift);
+      subptr(count, 1<<shift);
     }
     BIND(L_fill_32_bytes);
     {
@@ -7137,19 +7137,19 @@ void MacroAssembler::generate_fill(BasicType t, bool aligned,
           Label L_fill_64_bytes_loop_avx3, L_check_fill_64_bytes_avx2;
 
           // If number of bytes to fill < VM_Version::avx3_threshold(), perform fill using AVX2
-          cmpl(count, VM_Version::avx3_threshold());
+          cmpptr(count, VM_Version::avx3_threshold());
           jccb(Assembler::below, L_check_fill_64_bytes_avx2);
 
           vpbroadcastd(xtmp, xtmp, Assembler::AVX_512bit);
 
-          subl(count, 16 << shift);
+          subptr(count, 16 << shift);
           jccb(Assembler::less, L_check_fill_32_bytes);
           align(16);
 
           BIND(L_fill_64_bytes_loop_avx3);
           evmovdqul(Address(to, 0), xtmp, Assembler::AVX_512bit);
           addptr(to, 64);
-          subl(count, 16 << shift);
+          subptr(count, 16 << shift);
           jcc(Assembler::greaterEqual, L_fill_64_bytes_loop_avx3);
           jmpb(L_check_fill_32_bytes);
 
@@ -7159,7 +7159,7 @@ void MacroAssembler::generate_fill(BasicType t, bool aligned,
         Label L_fill_64_bytes_loop;
         vpbroadcastd(xtmp, xtmp, Assembler::AVX_256bit);
 
-        subl(count, 16 << shift);
+        subptr(count, 16 << shift);
         jcc(Assembler::less, L_check_fill_32_bytes);
         align(16);
 
@@ -7167,15 +7167,15 @@ void MacroAssembler::generate_fill(BasicType t, bool aligned,
         vmovdqu(Address(to, 0), xtmp);
         vmovdqu(Address(to, 32), xtmp);
         addptr(to, 64);
-        subl(count, 16 << shift);
+        subptr(count, 16 << shift);
         jcc(Assembler::greaterEqual, L_fill_64_bytes_loop);
 
         BIND(L_check_fill_32_bytes);
-        addl(count, 8 << shift);
+        addptr(count, 8 << shift);
         jccb(Assembler::less, L_check_fill_8_bytes);
         vmovdqu(Address(to, 0), xtmp);
         addptr(to, 32);
-        subl(count, 8 << shift);
+        subptr(count, 8 << shift);
 
         BIND(L_check_fill_8_bytes);
         // clean upper bits of YMM registers
@@ -7185,7 +7185,7 @@ void MacroAssembler::generate_fill(BasicType t, bool aligned,
         // Fill 32-byte chunks
         pshufd(xtmp, xtmp, 0);
 
-        subl(count, 8 << shift);
+        subptr(count, 8 << shift);
         jcc(Assembler::less, L_check_fill_8_bytes);
         align(16);
 
@@ -7202,12 +7202,12 @@ void MacroAssembler::generate_fill(BasicType t, bool aligned,
         }
 
         addptr(to, 32);
-        subl(count, 8 << shift);
+        subptr(count, 8 << shift);
         jcc(Assembler::greaterEqual, L_fill_32_bytes_loop);
 
         BIND(L_check_fill_8_bytes);
       }
-      addl(count, 8 << shift);
+      addptr(count, 8 << shift);
       jccb(Assembler::zero, L_exit);
       jmpb(L_fill_8_bytes);
 
@@ -7218,7 +7218,7 @@ void MacroAssembler::generate_fill(BasicType t, bool aligned,
       movq(Address(to, 0), xtmp);
       addptr(to, 8);
       BIND(L_fill_8_bytes);
-      subl(count, 1 << (shift + 1));
+      subptr(count, 1 << (shift + 1));
       jcc(Assembler::greaterEqual, L_fill_8_bytes_loop);
     }
   }
