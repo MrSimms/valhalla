@@ -153,7 +153,7 @@ inline void ModRefBarrierSet::AccessBarrier<decorators, BarrierSetT>::
 clone_in_heap(oop src, oop dst, size_t size) {
   Raw::clone(src, dst, size);
   BarrierSetT *bs = barrier_set_cast<BarrierSetT>(barrier_set());
-  bs->invalidate(MemRegion((HeapWord*)(void*)dst, size));
+  bs->write_region(MemRegion((HeapWord*)(void*)dst, size));
 }
 
 template <DecoratorSet decorators, typename BarrierSetT>

@@ -1996,7 +1996,8 @@ const int ObjectAlignmentInBytes = 8;
           "and leading and trailing stars '*' are wildcards)")              \
                                                                             \
   product(bool, UseEmptySlotsInSupers, true,                                \
-                "Allow allocating fields in empty slots of super-classes")  \
+          "(Deprecated) Allow allocating fields in empty slots of "         \
+          "super-classes")                                                  \
                                                                             \
   product(bool, DeoptimizeNMethodBarriersALot, false, DIAGNOSTIC,           \
                 "Make nmethod barriers deoptimise a lot.")                  \
