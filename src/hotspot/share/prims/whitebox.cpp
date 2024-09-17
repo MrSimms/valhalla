@@ -1887,10 +1887,6 @@ WB_ENTRY(jobjectArray, WB_GetResolvedReferences(JNIEnv* env, jobject wb, jclass 
   return (jobjectArray)JNIHandles::make_local(THREAD, resolved_refs);
 WB_END
 
-WB_ENTRY(jint, WB_ConstantPoolEncodeIndyIndex(JNIEnv* env, jobject wb, jint index))
-  return ConstantPool::encode_invokedynamic_index(index);
-WB_END
-
 WB_ENTRY(jobjectArray, WB_getObjectsViaKlassOopMaps(JNIEnv* env, jobject wb, jobject thing))
   oop aoop = JNIHandles::resolve(thing);
   if (!aoop->is_instance()) {
@@ -2935,8 +2931,6 @@ static JNINativeMethod methods[] = {
   {CC"forceClassLoaderStatsSafepoint", CC"()V",       (void*)&WB_ForceClassLoaderStatsSafepoint },
   {CC"getConstantPool0",   CC"(Ljava/lang/Class;)J",  (void*)&WB_GetConstantPool    },
   {CC"getResolvedReferences0", CC"(Ljava/lang/Class;)[Ljava/lang/Object;", (void*)&WB_GetResolvedReferences},
-  {CC"encodeConstantPoolIndyIndex0",
-      CC"(I)I",                      (void*)&WB_ConstantPoolEncodeIndyIndex},
   {CC"getObjectsViaKlassOopMaps0",
       CC"(Ljava/lang/Object;)[Ljava/lang/Object;",    (void*)&WB_getObjectsViaKlassOopMaps},
   {CC"getObjectsViaOopIterator0",
